@@ -934,7 +934,7 @@ static OWSSignalServiceProtosContent* defaultOWSSignalServiceProtosContentInstan
 @interface OWSSignalServiceProtosCallMessage ()
 @property (strong) OWSSignalServiceProtosCallMessageOffer* offer;
 @property (strong) OWSSignalServiceProtosCallMessageAnswer* answer;
-@property (strong) OWSSignalServiceProtosCallMessageIceUpdate* iceUpdate;
+@property (strong) NSMutableArray<OWSSignalServiceProtosCallMessageIceUpdate*> * iceUpdateArray;
 @property (strong) OWSSignalServiceProtosCallMessageHangup* hangup;
 @property (strong) OWSSignalServiceProtosCallMessageBusy* busy;
 @end
@@ -955,13 +955,8 @@ static OWSSignalServiceProtosContent* defaultOWSSignalServiceProtosContentInstan
   hasAnswer_ = !!_value_;
 }
 @synthesize answer;
-- (BOOL) hasIceUpdate {
-  return !!hasIceUpdate_;
-}
-- (void) setHasIceUpdate:(BOOL) _value_ {
-  hasIceUpdate_ = !!_value_;
-}
-@synthesize iceUpdate;
+@synthesize iceUpdateArray;
+@dynamic iceUpdate;
 - (BOOL) hasHangup {
   return !!hasHangup_;
 }
@@ -980,7 +975,6 @@ static OWSSignalServiceProtosContent* defaultOWSSignalServiceProtosContentInstan
   if ((self = [super init])) {
     self.offer = [OWSSignalServiceProtosCallMessageOffer defaultInstance];
     self.answer = [OWSSignalServiceProtosCallMessageAnswer defaultInstance];
-    self.iceUpdate = [OWSSignalServiceProtosCallMessageIceUpdate defaultInstance];
     self.hangup = [OWSSignalServiceProtosCallMessageHangup defaultInstance];
     self.busy = [OWSSignalServiceProtosCallMessageBusy defaultInstance];
   }
@@ -998,6 +992,12 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
 - (instancetype) defaultInstance {
   return defaultOWSSignalServiceProtosCallMessageInstance;
 }
+- (NSArray<OWSSignalServiceProtosCallMessageIceUpdate*> *)iceUpdate {
+  return iceUpdateArray;
+}
+- (OWSSignalServiceProtosCallMessageIceUpdate*)iceUpdateAtIndex:(NSUInteger)index {
+  return [iceUpdateArray objectAtIndex:index];
+}
 - (BOOL) isInitialized {
   return YES;
 }
@@ -1008,9 +1008,9 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
   if (self.hasAnswer) {
     [output writeMessage:2 value:self.answer];
   }
-  if (self.hasIceUpdate) {
-    [output writeMessage:3 value:self.iceUpdate];
-  }
+  [self.iceUpdateArray enumerateObjectsUsingBlock:^(OWSSignalServiceProtosCallMessageIceUpdate *element, NSUInteger idx, BOOL *stop) {
+    [output writeMessage:3 value:element];
+  }];
   if (self.hasHangup) {
     [output writeMessage:4 value:self.hangup];
   }
@@ -1032,9 +1032,9 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
   if (self.hasAnswer) {
     size_ += computeMessageSize(2, self.answer);
   }
-  if (self.hasIceUpdate) {
-    size_ += computeMessageSize(3, self.iceUpdate);
-  }
+  [self.iceUpdateArray enumerateObjectsUsingBlock:^(OWSSignalServiceProtosCallMessageIceUpdate *element, NSUInteger idx, BOOL *stop) {
+    size_ += computeMessageSize(3, element);
+  }];
   if (self.hasHangup) {
     size_ += computeMessageSize(4, self.hangup);
   }
@@ -1088,12 +1088,12 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
                          withIndent:[NSString stringWithFormat:@"%@  ", indent]];
     [output appendFormat:@"%@}\n", indent];
   }
-  if (self.hasIceUpdate) {
+  [self.iceUpdateArray enumerateObjectsUsingBlock:^(OWSSignalServiceProtosCallMessageIceUpdate *element, NSUInteger idx, BOOL *stop) {
     [output appendFormat:@"%@%@ {\n", indent, @"iceUpdate"];
-    [self.iceUpdate writeDescriptionTo:output
-                         withIndent:[NSString stringWithFormat:@"%@  ", indent]];
+    [element writeDescriptionTo:output
+                     withIndent:[NSString stringWithFormat:@"%@  ", indent]];
     [output appendFormat:@"%@}\n", indent];
-  }
+  }];
   if (self.hasHangup) {
     [output appendFormat:@"%@%@ {\n", indent, @"hangup"];
     [self.hangup writeDescriptionTo:output
@@ -1119,10 +1119,10 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
    [self.answer storeInDictionary:messageDictionary];
    [dictionary setObject:[NSDictionary dictionaryWithDictionary:messageDictionary] forKey:@"answer"];
   }
-  if (self.hasIceUpdate) {
-   NSMutableDictionary *messageDictionary = [NSMutableDictionary dictionary]; 
-   [self.iceUpdate storeInDictionary:messageDictionary];
-   [dictionary setObject:[NSDictionary dictionaryWithDictionary:messageDictionary] forKey:@"iceUpdate"];
+  for (OWSSignalServiceProtosCallMessageIceUpdate* element in self.iceUpdateArray) {
+    NSMutableDictionary *elementDictionary = [NSMutableDictionary dictionary];
+    [element storeInDictionary:elementDictionary];
+    [dictionary setObject:[NSDictionary dictionaryWithDictionary:elementDictionary] forKey:@"iceUpdate"];
   }
   if (self.hasHangup) {
    NSMutableDictionary *messageDictionary = [NSMutableDictionary dictionary]; 
@@ -1149,8 +1149,7 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
       (!self.hasOffer || [self.offer isEqual:otherMessage.offer]) &&
       self.hasAnswer == otherMessage.hasAnswer &&
       (!self.hasAnswer || [self.answer isEqual:otherMessage.answer]) &&
-      self.hasIceUpdate == otherMessage.hasIceUpdate &&
-      (!self.hasIceUpdate || [self.iceUpdate isEqual:otherMessage.iceUpdate]) &&
+      [self.iceUpdateArray isEqualToArray:otherMessage.iceUpdateArray] &&
       self.hasHangup == otherMessage.hasHangup &&
       (!self.hasHangup || [self.hangup isEqual:otherMessage.hangup]) &&
       self.hasBusy == otherMessage.hasBusy &&
@@ -1165,9 +1164,9 @@ static OWSSignalServiceProtosCallMessage* defaultOWSSignalServiceProtosCallMessa
   if (self.hasAnswer) {
     hashCode = hashCode * 31 + [self.answer hash];
   }
-  if (self.hasIceUpdate) {
-    hashCode = hashCode * 31 + [self.iceUpdate hash];
-  }
+  [self.iceUpdateArray enumerateObjectsUsingBlock:^(OWSSignalServiceProtosCallMessageIceUpdate *element, NSUInteger idx, BOOL *stop) {
+    hashCode = hashCode * 31 + [element hash];
+  }];
   if (self.hasHangup) {
     hashCode = hashCode * 31 + [self.hangup hash];
   }
@@ -2498,8 +2497,12 @@ static OWSSignalServiceProtosCallMessageHangup* defaultOWSSignalServiceProtosCal
   if (other.hasAnswer) {
     [self mergeAnswer:other.answer];
   }
-  if (other.hasIceUpdate) {
-    [self mergeIceUpdate:other.iceUpdate];
+  if (other.iceUpdateArray.count > 0) {
+    if (resultCallMessage.iceUpdateArray == nil) {
+      resultCallMessage.iceUpdateArray = [[NSMutableArray alloc] initWithArray:other.iceUpdateArray];
+    } else {
+      [resultCallMessage.iceUpdateArray addObjectsFromArray:other.iceUpdateArray];
+    }
   }
   if (other.hasHangup) {
     [self mergeHangup:other.hangup];
@@ -2548,11 +2551,8 @@ static OWSSignalServiceProtosCallMessageHangup* defaultOWSSignalServiceProtosCal
       }
       case 26: {
         OWSSignalServiceProtosCallMessageIceUpdateBuilder* subBuilder = [OWSSignalServiceProtosCallMessageIceUpdate builder];
-        if (self.hasIceUpdate) {
-          [subBuilder mergeFrom:self.iceUpdate];
-        }
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setIceUpdate:[subBuilder buildPartial]];
+        [self addIceUpdate:[subBuilder buildPartial]];
         break;
       }
       case 34: {
@@ -2636,34 +2636,25 @@ static OWSSignalServiceProtosCallMessageHangup* defaultOWSSignalServiceProtosCal
   resultCallMessage.answer = [OWSSignalServiceProtosCallMessageAnswer defaultInstance];
   return self;
 }
-- (BOOL) hasIceUpdate {
-  return resultCallMessage.hasIceUpdate;
+- (NSMutableArray<OWSSignalServiceProtosCallMessageIceUpdate*> *)iceUpdate {
+  return resultCallMessage.iceUpdateArray;
 }
-- (OWSSignalServiceProtosCallMessageIceUpdate*) iceUpdate {
-  return resultCallMessage.iceUpdate;
+- (OWSSignalServiceProtosCallMessageIceUpdate*)iceUpdateAtIndex:(NSUInteger)index {
+  return [resultCallMessage iceUpdateAtIndex:index];
 }
-- (OWSSignalServiceProtosCallMessageBuilder*) setIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate*) value {
-  resultCallMessage.hasIceUpdate = YES;
-  resultCallMessage.iceUpdate = value;
-  return self;
-}
-- (OWSSignalServiceProtosCallMessageBuilder*) setIceUpdateBuilder:(OWSSignalServiceProtosCallMessageIceUpdateBuilder*) builderForValue {
-  return [self setIceUpdate:[builderForValue build]];
-}
-- (OWSSignalServiceProtosCallMessageBuilder*) mergeIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate*) value {
-  if (resultCallMessage.hasIceUpdate &&
-      resultCallMessage.iceUpdate != [OWSSignalServiceProtosCallMessageIceUpdate defaultInstance]) {
-    resultCallMessage.iceUpdate =
-      [[[OWSSignalServiceProtosCallMessageIceUpdate builderWithPrototype:resultCallMessage.iceUpdate] mergeFrom:value] buildPartial];
-  } else {
-    resultCallMessage.iceUpdate = value;
+- (OWSSignalServiceProtosCallMessageBuilder *)addIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate*)value {
+  if (resultCallMessage.iceUpdateArray == nil) {
+    resultCallMessage.iceUpdateArray = [[NSMutableArray alloc]init];
   }
-  resultCallMessage.hasIceUpdate = YES;
+  [resultCallMessage.iceUpdateArray addObject:value];
   return self;
 }
-- (OWSSignalServiceProtosCallMessageBuilder*) clearIceUpdate {
-  resultCallMessage.hasIceUpdate = NO;
-  resultCallMessage.iceUpdate = [OWSSignalServiceProtosCallMessageIceUpdate defaultInstance];
+- (OWSSignalServiceProtosCallMessageBuilder *)setIceUpdateArray:(NSArray<OWSSignalServiceProtosCallMessageIceUpdate*> *)array {
+  resultCallMessage.iceUpdateArray = [[NSMutableArray alloc]initWithArray:array];
+  return self;
+}
+- (OWSSignalServiceProtosCallMessageBuilder *)clearIceUpdate {
+  resultCallMessage.iceUpdateArray = nil;
   return self;
 }
 - (BOOL) hasHangup {

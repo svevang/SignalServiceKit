@@ -335,25 +335,24 @@ NSString *NSStringFromOWSSignalServiceProtosGroupContextType(OWSSignalServicePro
 @private
   BOOL hasOffer_:1;
   BOOL hasAnswer_:1;
-  BOOL hasIceUpdate_:1;
   BOOL hasHangup_:1;
   BOOL hasBusy_:1;
   OWSSignalServiceProtosCallMessageOffer* offer;
   OWSSignalServiceProtosCallMessageAnswer* answer;
-  OWSSignalServiceProtosCallMessageIceUpdate* iceUpdate;
   OWSSignalServiceProtosCallMessageHangup* hangup;
   OWSSignalServiceProtosCallMessageBusy* busy;
+  NSMutableArray * iceUpdateArray;
 }
 - (BOOL) hasOffer;
 - (BOOL) hasAnswer;
-- (BOOL) hasIceUpdate;
 - (BOOL) hasHangup;
 - (BOOL) hasBusy;
 @property (readonly, strong) OWSSignalServiceProtosCallMessageOffer* offer;
 @property (readonly, strong) OWSSignalServiceProtosCallMessageAnswer* answer;
-@property (readonly, strong) OWSSignalServiceProtosCallMessageIceUpdate* iceUpdate;
+@property (readonly, strong) NSArray<OWSSignalServiceProtosCallMessageIceUpdate*> * iceUpdate;
 @property (readonly, strong) OWSSignalServiceProtosCallMessageHangup* hangup;
 @property (readonly, strong) OWSSignalServiceProtosCallMessageBusy* busy;
+- (OWSSignalServiceProtosCallMessageIceUpdate*)iceUpdateAtIndex:(NSUInteger)index;
 
 + (instancetype) defaultInstance;
 - (instancetype) defaultInstance;
@@ -704,12 +703,11 @@ NSString *NSStringFromOWSSignalServiceProtosGroupContextType(OWSSignalServicePro
 - (OWSSignalServiceProtosCallMessageBuilder*) mergeAnswer:(OWSSignalServiceProtosCallMessageAnswer*) value;
 - (OWSSignalServiceProtosCallMessageBuilder*) clearAnswer;
 
-- (BOOL) hasIceUpdate;
-- (OWSSignalServiceProtosCallMessageIceUpdate*) iceUpdate;
-- (OWSSignalServiceProtosCallMessageBuilder*) setIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate*) value;
-- (OWSSignalServiceProtosCallMessageBuilder*) setIceUpdateBuilder:(OWSSignalServiceProtosCallMessageIceUpdateBuilder*) builderForValue;
-- (OWSSignalServiceProtosCallMessageBuilder*) mergeIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate*) value;
-- (OWSSignalServiceProtosCallMessageBuilder*) clearIceUpdate;
+- (NSMutableArray<OWSSignalServiceProtosCallMessageIceUpdate*> *)iceUpdate;
+- (OWSSignalServiceProtosCallMessageIceUpdate*)iceUpdateAtIndex:(NSUInteger)index;
+- (OWSSignalServiceProtosCallMessageBuilder *)addIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate*)value;
+- (OWSSignalServiceProtosCallMessageBuilder *)setIceUpdateArray:(NSArray<OWSSignalServiceProtosCallMessageIceUpdate*> *)array;
+- (OWSSignalServiceProtosCallMessageBuilder *)clearIceUpdate;
 
 - (BOOL) hasHangup;
 - (OWSSignalServiceProtosCallMessageHangup*) hangup;
