@@ -39,12 +39,12 @@ message Content {
 message CallMessage {
   message Offer {
     optional uint64 id          = 1;
-    optional string description = 2;
+    optional string sessionDescription = 2;
   }
 
   message Answer {
     optional uint64 id          = 1;
-    optional string description = 2;
+    optional string sessionDescription = 2;
   }
 
   message IceUpdate {

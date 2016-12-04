@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
     OWSSignalServiceProtosCallMessageOfferBuilder *builder = [OWSSignalServiceProtosCallMessageOfferBuilder new];
 
     builder.id = self.callId;
-    builder.description = self.description;
+    builder.sessionDescription = self.sessionDescription;
 
     return [builder build];
 }
