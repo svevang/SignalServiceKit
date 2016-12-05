@@ -7,6 +7,7 @@
 //
 
 #import "TSErrorMessage.h"
+#import "NotificationsProtocol.h"
 #import "TSContactThread.h"
 #import "TSErrorMessage_privateConstructor.h"
 #import "TSMessagesManager.h"

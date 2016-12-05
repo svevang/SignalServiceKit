@@ -7,7 +7,9 @@
 #import "MimeTypeUtil.h"
 #import "NSData+messagePadding.h"
 #import "NSDate+millisecondTimeStamp.h"
+#import "NotificationsProtocol.h"
 #import "OWSAttachmentsProcessor.h"
+#import "OWSCallMessageHandler.h"
 #import "OWSDisappearingConfigurationUpdateInfoMessage.h"
 #import "OWSDisappearingMessagesConfiguration.h"
 #import "OWSDisappearingMessagesJob.h"
@@ -36,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TSMessagesManager ()
 
+@property (nonatomic, readonly) id<OWSCallMessageHandler> callMessageHandler;
 @property (nonatomic, readonly) id<ContactsManagerProtocol> contactsManager;
 @property (nonatomic, readonly) TSStorageManager *storageManager;
 @property (nonatomic, readonly) OWSMessageSender *messageSender;
@@ -59,6 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
     TSNetworkManager *networkManager = [TSNetworkManager sharedManager];
     TSStorageManager *storageManager = [TSStorageManager sharedManager];
     id<ContactsManagerProtocol> contactsManager = [TextSecureKitEnv sharedEnv].contactsManager;
+    id<OWSCallMessageHandler> callMessageHandler = [TextSecureKitEnv sharedEnv].callMessageHandler;
     ContactsUpdater *contactsUpdater = [ContactsUpdater sharedUpdater];
     OWSMessageSender *messageSender = [[OWSMessageSender alloc] initWithNetworkManager:networkManager
                                                                         storageManager:storageManager
@@ -67,6 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     return [self initWithNetworkManager:networkManager
                          storageManager:storageManager
+                     callMessageHandler:callMessageHandler
                         contactsManager:contactsManager
                         contactsUpdater:contactsUpdater
                           messageSender:messageSender];
@@ -74,6 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithNetworkManager:(TSNetworkManager *)networkManager
                         storageManager:(TSStorageManager *)storageManager
+                    callMessageHandler:(id<OWSCallMessageHandler>)callMessageHandler
                        contactsManager:(id<ContactsManagerProtocol>)contactsManager
                        contactsUpdater:(ContactsUpdater *)contactsUpdater
                          messageSender:(OWSMessageSender *)messageSender
@@ -86,6 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     _storageManager = storageManager;
     _networkManager = networkManager;
+    _callMessageHandler = callMessageHandler;
     _contactsManager = contactsManager;
     _contactsUpdater = contactsUpdater;
     _messageSender = messageSender;
@@ -229,6 +236,8 @@ NS_ASSUME_NONNULL_BEGIN
             [self handleIncomingEnvelope:envelope withSyncMessage:content.syncMessage];
         } else if (content.hasDataMessage) {
             [self handleIncomingEnvelope:envelope withDataMessage:content.dataMessage];
+        } else if (content.hasCallMessage) {
+            [self handleIncomingEnvelope:envelope withCallMessage:content.callMessage];
         } else {
             DDLogWarn(@"%@ Ignoring envelope.Content with no known payload", self.tag);
         }
@@ -278,6 +287,27 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 }
+
+- (void)handleIncomingEnvelope:(OWSSignalServiceProtosEnvelope *)incomingEnvelope
+               withCallMessage:(OWSSignalServiceProtosCallMessage *)callMessage
+{
+    if (callMessage.hasOffer) {
+        DDLogVerbose(@"%@ Received CallMessage with Offer.", self.tag);
+        [self.callMessageHandler receivedOffer:callMessage.offer];
+    } else if (callMessage.hasAnswer) {
+        DDLogVerbose(@"%@ Received CallMessage with Answer.", self.tag);
+        [self.callMessageHandler receivedAnswer:callMessage.answer];
+    } else if (callMessage.iceUpdate.count > 0) {
+        DDLogVerbose(@"%@ Received CallMessage with IceUpdates.", self.tag);
+        [self.callMessageHandler receivedIceUpdates:callMessage.iceUpdate];
+    } else if (callMessage.hasHangup) {
+        DDLogVerbose(@"%@ Received CallMessage with Hangup.", self.tag);
+        [self.callMessageHandler receivedHangup:callMessage.hangup];
+    } else {
+        DDLogWarn(@"%@ Received callMessage without actionable content. Ignoring.", self.tag);
+    }
+}
+
 
 - (void)handleReceivedGroupAvatarUpdateWithEnvelope:(OWSSignalServiceProtosEnvelope *)envelope
                                         dataMessage:(OWSSignalServiceProtosDataMessage *)dataMessage
