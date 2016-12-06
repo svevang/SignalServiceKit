@@ -298,8 +298,10 @@ NS_ASSUME_NONNULL_BEGIN
         DDLogVerbose(@"%@ Received CallMessage with Answer.", self.tag);
         [self.callMessageHandler receivedAnswer:callMessage.answer fromCallerId:incomingEnvelope.source];
     } else if (callMessage.iceUpdate.count > 0) {
-        DDLogVerbose(@"%@ Received CallMessage with IceUpdates.", self.tag);
-        [self.callMessageHandler receivedIceUpdates:callMessage.iceUpdate fromCallerId:incomingEnvelope.source];
+        DDLogVerbose(@"%@ Received CallMessage with %lu IceUpdates.", self.tag, (unsigned long)callMessage.iceUpdate.count);
+        for (OWSSignalServiceProtosCallMessageIceUpdate *iceUpdate in callMessage.iceUpdate) {
+            [self.callMessageHandler receivedIceUpdate:iceUpdate fromCallerId:incomingEnvelope.source];
+        }
     } else if (callMessage.hasHangup) {
         DDLogVerbose(@"%@ Received CallMessage with Hangup.", self.tag);
         [self.callMessageHandler receivedHangup:callMessage.hangup fromCallerId:incomingEnvelope.source];
