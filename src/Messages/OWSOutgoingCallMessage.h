@@ -6,12 +6,17 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class OWSCallOfferMessage;
+@class OWSCallAnswerMessage;
+@class TSThread;
 
 @interface OWSOutgoingCallMessage : TSOutgoingMessage
 
-- (instancetype)initWithOfferMessage:(OWSCallOfferMessage *)offerMessage;
+- (instancetype)initWithOfferMessage:(OWSCallOfferMessage *)offerMessage thread:(TSThread *)thread;
+- (instancetype)initWithAnswerMessage:(OWSCallAnswerMessage *)answerMessage thread:(TSThread *)thread;
 
+@property (nonnull, nonatomic, readonly, strong) TSThread *thread;
 @property (nullable, nonatomic, readonly, strong) OWSCallOfferMessage *offerMessage;
+@property (nullable, nonatomic, readonly, strong) OWSCallAnswerMessage *answerMessage;
 
 @end
 

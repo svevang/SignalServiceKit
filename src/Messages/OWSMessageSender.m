@@ -620,14 +620,11 @@ NSString *const OWSMessageSenderRateLimitedException = @"RateLimitedException";
 
     for (NSNumber *deviceNumber in recipient.devices) {
         @try {
-            // DEPRECATED - Remove after all clients have been upgraded.
-            BOOL isLegacyMessage = ![message isKindOfClass:[OWSOutgoingSyncMessage class]];
-
             NSDictionary *messageDict = [self encryptedMessageWithPlaintext:plainText
                                                                 toRecipient:recipient.uniqueId
                                                                    deviceId:deviceNumber
                                                               keyingStorage:[TSStorageManager sharedManager]
-                                                                     legacy:isLegacyMessage];
+                                                                     legacy:message.isLegacyMessage];
             if (messageDict) {
                 [messagesArray addObject:messageDict];
             } else {

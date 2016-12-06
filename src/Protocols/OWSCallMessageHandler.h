@@ -10,10 +10,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol OWSCallMessageHandler <NSObject>
 
-- (void)receivedOffer:(OWSSignalServiceProtosCallMessageOffer *)offer;
-- (void)receivedAnswer:(OWSSignalServiceProtosCallMessageAnswer *)answer;
-- (void)receivedIceUpdates:(NSArray<OWSSignalServiceProtosCallMessageIceUpdate *> *)iceUpdates;
-- (void)receivedHangup:(OWSSignalServiceProtosCallMessageHangup *)hangup;
+- (void)receivedOffer:(OWSSignalServiceProtosCallMessageOffer *)offer fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedOffer(_:from:));
+- (void)receivedAnswer:(OWSSignalServiceProtosCallMessageAnswer *)answer fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedAnswer(_:from:));
+- (void)receivedIceUpdates:(NSArray<OWSSignalServiceProtosCallMessageIceUpdate *> *)iceUpdates fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedIceUpdates(_:from:));
+- (void)receivedHangup:(OWSSignalServiceProtosCallMessageHangup *)hangup fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedHangup(_:from:));
 
 @end
 

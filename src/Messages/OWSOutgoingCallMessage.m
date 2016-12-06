@@ -3,13 +3,16 @@
 
 #import "OWSOutgoingCallMessage.h"
 #import "OWSCallOfferMessage.h"
+#import "OWSCallAnswerMessage.h"
 #import "OWSSignalServiceProtos.pb.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation OWSOutgoingCallMessage
 
-- (instancetype)initWithOfferMessage:(OWSCallOfferMessage *)offerMessage
+@synthesize thread = _thread;
+
+- (instancetype)initWithOfferMessage:(OWSCallOfferMessage *)offerMessage thread:(TSThread *)thread
 {
     self = [super init];
     if (!self) {
@@ -17,6 +20,20 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     _offerMessage = offerMessage;
+    _thread = thread;
+
+    return self;
+}
+
+- (instancetype)initWithAnswerMessage:(OWSCallAnswerMessage *)answerMessage thread:(TSThread *)thread
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+
+    _answerMessage = answerMessage;
+    _thread = thread;
 
     return self;
 }
@@ -24,6 +41,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)shouldSyncTranscript
 {
     return NO;
+}
+
+- (BOOL)isLegacyMessage
+{
+    return NO;
+}
+
+/**
+ * override thread accessor in superclass, since this model is never saved.
+ * TODO review
+ */
+- (TSThread *)thread
+{
+    return _thread;
 }
 
 - (NSData *)buildPlainTextData
@@ -40,6 +71,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     if (self.offerMessage) {
         [builder setOffer:[self.offerMessage asProtobuf]];
+    }
+
+    if (self.answerMessage) {
+        [builder setAnswer:[self.answerMessage asProtobuf]];
     }
 
     return [builder build];
