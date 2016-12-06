@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)receivedOffer:(OWSSignalServiceProtosCallMessageOffer *)offer fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedOffer(_:from:));
 - (void)receivedAnswer:(OWSSignalServiceProtosCallMessageAnswer *)answer fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedAnswer(_:from:));
-- (void)receivedIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate *)iceUpdate fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedIceUpdate(_:from:));
+- (void)receivedIceUpdate:(OWSSignalServiceProtosCallMessageIceUpdate *)iceUpdate
+             fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedIceUpdate(_:from:));
 - (void)receivedHangup:(OWSSignalServiceProtosCallMessageHangup *)hangup fromCallerId:(NSString *)callerId NS_SWIFT_NAME(receivedHangup(_:from:));
 
 @end

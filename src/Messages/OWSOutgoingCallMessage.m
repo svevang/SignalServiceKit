@@ -4,6 +4,7 @@
 #import "OWSOutgoingCallMessage.h"
 #import "OWSCallOfferMessage.h"
 #import "OWSCallAnswerMessage.h"
+#import "OWSCallIceUpdateMessage.h"
 #import "OWSSignalServiceProtos.pb.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -12,28 +13,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 @synthesize thread = _thread;
 
-- (instancetype)initWithOfferMessage:(OWSCallOfferMessage *)offerMessage thread:(TSThread *)thread
+- (instancetype)initWithThread:(TSThread *)thread offerMessage:(OWSCallOfferMessage *)offerMessage
 {
     self = [super init];
     if (!self) {
         return self;
     }
 
-    _offerMessage = offerMessage;
     _thread = thread;
+    _offerMessage = offerMessage;
 
     return self;
 }
 
-- (instancetype)initWithAnswerMessage:(OWSCallAnswerMessage *)answerMessage thread:(TSThread *)thread
+- (instancetype)initWithThread:(TSThread *)thread answerMessage:(OWSCallAnswerMessage *)answerMessage
 {
     self = [super init];
     if (!self) {
         return self;
     }
 
-    _answerMessage = answerMessage;
     _thread = thread;
+    _answerMessage = answerMessage;
+
+    return self;
+}
+
+- (instancetype)initWithThread:(TSThread *)thread iceUpdateMessage:(OWSCallIceUpdateMessage *)iceUpdateMessage
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+
+    _thread = thread;
+    _iceUpdateMessage = iceUpdateMessage;
 
     return self;
 }
