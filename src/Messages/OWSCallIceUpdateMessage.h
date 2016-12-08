@@ -1,9 +1,10 @@
 //  Created by Michael Kirk on 12/6/16.
 //  Copyright © 2016 Open Whisper Systems. All rights reserved.
 
-#import "OWSSignalServiceProtos.pb.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class OWSSignalServiceProtosCallMessageIceUpdate;
 
 @interface OWSCallIceUpdateMessage : NSObject
 
@@ -12,7 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) SInt32 sdpMLineIndex;
 @property (nullable, nonatomic, readonly, copy) NSString *sdpMid;
 
-- (instancetype)initWithCallId:(UInt64)callId sdp:(NSString *)sdp sdpMLineIndex:(SInt32)sdpMLineIndex sdpMid:(nullable NSString *)sdpMid;
+- (instancetype)initWithCallId:(UInt64)callId
+                           sdp:(NSString *)sdp
+                 sdpMLineIndex:(SInt32)sdpMLineIndex
+                        sdpMid:(nullable NSString *)sdpMid;
+
 - (OWSSignalServiceProtosCallMessageIceUpdate *)asProtobuf;
 
 @end

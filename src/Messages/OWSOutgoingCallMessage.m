@@ -2,9 +2,9 @@
 //  Copyright © 2016 Open Whisper Systems. All rights reserved.
 
 #import "OWSOutgoingCallMessage.h"
-#import "OWSCallOfferMessage.h"
 #import "OWSCallAnswerMessage.h"
 #import "OWSCallIceUpdateMessage.h"
+#import "OWSCallOfferMessage.h"
 #import "OWSSignalServiceProtos.pb.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -47,10 +47,26 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     _thread = thread;
-    _iceUpdateMessage = iceUpdateMessage;
+    _iceUpdateMessages = @[ iceUpdateMessage ];
 
     return self;
 }
+
+- (instancetype)initWithThread:(TSThread *)thread
+             iceUpdateMessages:(NSArray<OWSCallIceUpdateMessage *> *)iceUpdateMessages
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+
+    _thread = thread;
+    _iceUpdateMessages = iceUpdateMessages;
+
+    return self;
+}
+
+#pragma mark - TSOutgoingMessage overrides
 
 - (BOOL)shouldSyncTranscript
 {
@@ -89,6 +105,12 @@ NS_ASSUME_NONNULL_BEGIN
 
     if (self.answerMessage) {
         [builder setAnswer:[self.answerMessage asProtobuf]];
+    }
+
+    if (self.iceUpdateMessages) {
+        for (OWSCallIceUpdateMessage *iceUpdateMessage in self.iceUpdateMessages) {
+            [builder addIceUpdate:[iceUpdateMessage asProtobuf]];
+        }
     }
 
     return [builder build];

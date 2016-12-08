@@ -305,6 +305,8 @@ NS_ASSUME_NONNULL_BEGIN
     } else if (callMessage.hasHangup) {
         DDLogVerbose(@"%@ Received CallMessage with Hangup.", self.tag);
         [self.callMessageHandler receivedHangup:callMessage.hangup fromCallerId:incomingEnvelope.source];
+    } else if (callMessage.hasBusy) {
+        [self.callMessageHandler receivedBusy:callMessage.busy fromCallerId:incomingEnvelope.source];
     } else {
         DDLogWarn(@"%@ Received callMessage without actionable content. Ignoring.", self.tag);
     }

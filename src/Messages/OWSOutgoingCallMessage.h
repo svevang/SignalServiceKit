@@ -15,11 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithThread:(TSThread *)thread offerMessage:(OWSCallOfferMessage *)offerMessage;
 - (instancetype)initWithThread:(TSThread *)thread answerMessage:(OWSCallAnswerMessage *)answerMessage;
 - (instancetype)initWithThread:(TSThread *)thread iceUpdateMessage:(OWSCallIceUpdateMessage *)iceUpdateMessage;
+- (instancetype)initWithThread:(TSThread *)thread
+             iceUpdateMessages:(NSArray<OWSCallIceUpdateMessage *> *)iceUpdateMessage;
 
 @property (nonnull, nonatomic, readonly, strong) TSThread *thread;
 @property (nullable, nonatomic, readonly, strong) OWSCallOfferMessage *offerMessage;
 @property (nullable, nonatomic, readonly, strong) OWSCallAnswerMessage *answerMessage;
-@property (nullable, nonatomic, readonly, strong) OWSCallIceUpdateMessage *iceUpdateMessage;
+@property (nullable, nonatomic, readonly, strong) NSArray<OWSCallIceUpdateMessage *> *iceUpdateMessages;
 
 @end
 
