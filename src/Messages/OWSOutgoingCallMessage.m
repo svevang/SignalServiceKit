@@ -3,6 +3,8 @@
 
 #import "OWSOutgoingCallMessage.h"
 #import "OWSCallAnswerMessage.h"
+#import "OWSCallBusyMessage.h"
+#import "OWSCallHangupMessage.h"
 #import "OWSCallIceUpdateMessage.h"
 #import "OWSCallOfferMessage.h"
 #import "OWSSignalServiceProtos.pb.h"
@@ -62,6 +64,32 @@ NS_ASSUME_NONNULL_BEGIN
 
     _thread = thread;
     _iceUpdateMessages = iceUpdateMessages;
+
+    return self;
+}
+
+- (instancetype)initWithThread:(TSThread *)thread hangupMessage:(OWSCallHangupMessage *)hangupMessage
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+
+    _thread = thread;
+    _hangupMessage = hangupMessage;
+
+    return self;
+}
+
+- (instancetype)initWithThread:(TSThread *)thread busyMessage:(OWSCallBusyMessage *)busyMessage
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+
+    _thread = thread;
+    _busyMessage = busyMessage;
 
     return self;
 }
