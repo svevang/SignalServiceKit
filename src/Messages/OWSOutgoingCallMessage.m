@@ -141,6 +141,10 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
+    if (self.hangupMessage) {
+        [builder setHangup:[self.hangupMessage asProtobuf]];
+    }
+
     return [builder build];
 }
 

@@ -308,7 +308,7 @@ NS_ASSUME_NONNULL_BEGIN
     } else if (callMessage.hasBusy) {
         [self.callMessageHandler receivedBusy:callMessage.busy fromCallerId:incomingEnvelope.source];
     } else {
-        DDLogWarn(@"%@ Received callMessage without actionable content. Ignoring.", self.tag);
+        DDLogWarn(@"%@ Ignoring Received CallMessage without actionable content: %@", self.tag, callMessage);
     }
 }
 
