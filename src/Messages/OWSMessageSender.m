@@ -83,6 +83,7 @@ NSString *const OWSMessageSenderRateLimitedException = @"RateLimitedException";
             success:(void (^)())successHandler
             failure:(void (^)(NSError *error))failureHandler
 {
+    DDLogDebug(@"%@ sending message: %@", self.tag, message.debugDescription);
     void (^markAndFailureHandler)(NSError *error) = ^(NSError *error) {
         [self saveMessage:message withError:error];
         failureHandler(error);

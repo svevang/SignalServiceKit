@@ -145,6 +145,10 @@ NS_ASSUME_NONNULL_BEGIN
         [builder setHangup:[self.hangupMessage asProtobuf]];
     }
 
+    if (self.busyMessage) {
+        [builder setBusy:[self.busyMessage asProtobuf]];
+    }
+
     return [builder build];
 }
 
@@ -159,6 +163,27 @@ NS_ASSUME_NONNULL_BEGIN
     // Should we find a need to save this in the future, we need to exclude any non-serializable properties.
 }
 
+- (NSString *)debugDescription
+{
+    NSString *className = NSStringFromClass([self class]);
+
+    NSString *payload;
+    if (self.offerMessage) {
+        payload = @"offerMessage";
+    } else if (self.answerMessage) {
+        payload = @"answerMessage";
+    } else if (self.iceUpdateMessages.count > 0) {
+        payload = @"iceUpdateMessage";
+    } else if (self.hangupMessage) {
+        payload = @"hangupMessage";
+    } else if (self.busyMessage) {
+        payload = @"busyMessage";
+    } else {
+        payload = @"none";
+    }
+
+    return [NSString stringWithFormat:@"%@ with payload: %@", className, payload];
+}
 
 @end
 
